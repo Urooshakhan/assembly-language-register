@@ -1,0 +1,67 @@
+.model small              ; small memory model (1 code + 1 data segment)
+
+.stack 100h               ; define stack segment (SS) of 256 bytes
+
+.data                     ; DATA SEGMENT (used by DS register)
+
+msg db 'HELLO$'           ; string to print ($ is required for int 21h,09h)
+extraData db 5 dup(?)     ; reserve 5 empty bytes
+
+.code                     ; CODE SEGMENT (used by CS register)
+
+main PROC
+
+; -----------------------------
+; Load Data Segment into DS
+; -----------------------------
+mov ax, @data         ; get address of data segment
+mov ds, ax            ; DS now points to data segment
+
+; -----------------------------
+; Load Extra Segment into ES
+; -----------------------------
+mov ax, @data         ; load same data segment
+mov es, ax            ; ES now also points to data segment
+
+; -----------------------------
+; Stack Segment (SS) Example
+; -----------------------------
+; Stack is already created by ".stack 100h"
+
+mov ax, 1234h         ; put value in AX
+push ax               ; push AX into stack (SS:SP)
+pop bx                ; pop value from stack into BX
+
+; -----------------------------
+; Using DS to print message
+; -----------------------------
+mov dx, offset msg    ; load address of msg into DX
+mov ah, 09h           ; DOS function to print string
+int 21h               ; call DOS interrupt
+
+; -----------------------------
+; Using ES to copy data
+; -----------------------------
+mov si, offset msg        ; SI points to msg (source)
+mov di, offset extraData  ; DI points to extraData (destination)
+mov cx, 5                 ; copy 5 characters
+
+copy_loop:
+mov al, [si]          ; get byte from DS:SI
+mov es:[di], al       ; store byte into ES:DI
+inc si                ; move to next source byte
+inc di                ; move to next destination byte
+loop copy_loop        ; repeat until CX = 0
+
+; -----------------------------
+; Program Exit
+; -----------------------------
+mov ah, 4Ch           ; DOS terminate function
+int 21h               ; return control to OS
+
+main ENDP
+END main
+
+
+
+; [SOURCE]: C:\Users\Pc\Desktop\mycode.asm
