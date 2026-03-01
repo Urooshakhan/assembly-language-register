@@ -1,0 +1,35 @@
+
+.model small
+.stack 100h
+
+.data
+num1 db 5
+num2 db 3
+result db ?
+
+.code
+main PROC
+mov ax, @data
+mov ds, ax
+
+mov al, num1
+mov bl, num2
+add al, bl
+
+mov result, al
+
+add al, 30h        ; convert to ASCII
+mov dl, al
+mov ah, 02h        ; print character
+int 21h
+
+mov ah, 4Ch
+int 21h
+main ENDP
+END main
+
+
+
+
+
+; [SOURCE]: C:\Users\Pc\Desktop\mycode.asm
