@@ -1,0 +1,71 @@
+.model small
+.stack 100h
+
+.data
+msg db 'HELLO$'        ; string to print
+buffer db 6 dup(?)     ; space to copy string
+
+.code
+main PROC
+
+; ----------------------------
+; Load Data Segment
+; ----------------------------
+mov ax, @data
+mov ds, ax
+
+; ==================================================
+; 1?? SP (Stack Pointer) - used automatically
+; ==================================================
+mov ax, 1111h
+push ax            ; SP decreases, value stored in stack
+
+mov ax, 2222h
+push ax            ; SP decreases again
+
+pop bx             ; SP increases, BX = 2222h
+
+; ==================================================
+; 2?? BP (Base Pointer) - access stack data
+; ==================================================
+mov bp, sp         ; BP points to current stack top
+mov dx, [bp]       ; Access stack value using BP
+
+; ==================================================
+; 3?? SI (Source Index) - used for source string
+; ==================================================
+mov si, offset msg ; SI points to source string
+
+; ==================================================
+; 4?? DI (Destination Index) - used for destination
+; ==================================================
+mov di, offset buffer ; DI points to destination buffer
+
+mov cx, 5          ; number of characters to copy
+
+copy_loop:
+mov al, [si]       ; read from DS:SI
+mov [di], al       ; write to DS:DI
+inc si             ; next source character
+inc di             ; next destination position
+loop copy_loop
+
+; ----------------------------
+; Print Original String
+; ----------------------------
+mov dx, offset msg
+mov ah, 09h
+int 21h
+
+; ----------------------------
+; Exit Program
+; ----------------------------
+mov ah, 4Ch
+int 21h
+
+main ENDP
+END main
+
+
+
+; [SOURCE]: C:\Users\Pc\Desktop\mycode.asm
